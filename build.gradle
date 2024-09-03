@@ -18,4 +18,8 @@ test {
 	}
 }
 
+run {
+    standardInput = System.in
+}
+
 mainClassName = 'com.csc.Payroll'

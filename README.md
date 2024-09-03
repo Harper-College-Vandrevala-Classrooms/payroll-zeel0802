@@ -1,8 +1,8 @@
-# Well That's Just Prime - Java Template
+# Payroll - Java Template
 
 ## Instructions
 
-You can find the instructions for this lab [here](https://cyrusvandrevala.com/teaching/csc/214/labs/well-thats-just-prime.html).
+You can find the instructions for this lab [here](https://cyrusvandrevala.com/teaching/csc/214/labs/payroll.html).
 
 In this lab, you will update both the source file and test file. Your implementation will live in `src/main/java/com/csc/Payroll.java` and your tests will live in `src/test/java/com/csc/TestPayroll.java`.
 
@@ -15,7 +15,7 @@ If you are using an IDE like Visual Studio, there are built-in utilities that wi
 
 ## Running the App
 
-In a terminal from the root of the project, type `gradle test` into the command line. This will run all of the automated tests.
+In a terminal from the root of the project, type `gradle run` into the command line. This will run the application in the terminal, allowing you to manually test the application.
 
 ## Testing
 
