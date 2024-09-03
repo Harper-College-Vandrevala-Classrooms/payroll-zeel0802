@@ -40,7 +40,8 @@ public class Payroll {
     System.out.print("FedTax:   $ " + String.format("%.2f", (pay * (float) 0.14)));
     System.out.print("StTax:   $ " + String.format("%.2f", (pay * (float) 0.05)));
     System.out.print("Union:   $ 10.00");
-    System.out.print("Ins:   $ 10.00");
+    System.out.print("Ins:   $ " + ); // Needs logic
+    System.out.print("LifeIns:   $ " + String.format(".2f", lifeInsurance));
 
     net = pay - (pay * (float) .25) - UNION_FEES - lifeInsurance;
 
