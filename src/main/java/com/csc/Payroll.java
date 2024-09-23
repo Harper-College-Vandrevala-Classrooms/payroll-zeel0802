@@ -1,80 +1,96 @@
 package com.csc;
 
-import java.util.Scanner;
-
 public class Payroll {
 
-    private static final double REGULAR_HOURLY_RATE = 16.78;
-    private static final double OVERTIME_RATE = REGULAR_HOURLY_RATE * 1.5;
     private static final double SOCIAL_SECURITY_TAX = 0.06;
     private static final double FEDERAL_TAX = 0.14;
     private static final double STATE_TAX = 0.05;
     private static final double UNION_DUES = 10.00;
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+    // Life Insurance Plan Costs
+    private static final double NO_PLAN = 0.00;
+    private static final double SINGLE_PLAN = 5.00;
+    private static final double MARRIED_PLAN = 10.00;
+    private static final double MARRIED_WITH_CHILDREN_PLAN = 15.00;
 
-        System.out.println("Welcome to the Payroll Program!");
+    // Overtime thresholds
+    private static final double OVERTIME_THRESHOLD = 40;
+    private static final double DOUBLE_OVERTIME_THRESHOLD = 50;
+    private static final double OVERTIME_MULTIPLIER = 1.5;
+    private static final double DOUBLE_OVERTIME_MULTIPLIER = 2.0;
 
-        // Get hours worked from the user
-        System.out.print("How many hours did you work this week? ");
-        double hoursWorked = scanner.nextDouble();
+    /**
+     * Calculate gross pay with regular, overtime, and double overtime hours
+     */
+    public static double calculateGrossPay(double hoursWorked, double payRate) {
+        double grossPay = 0;
 
-        // Get the number of dependents from the user
-        System.out.print("How many children do you have? ");
-        int dependents = scanner.nextInt();
-
-        // Generate the payroll report
-        generatePayrollReport(hoursWorked, dependents);
-
-        // Exit message
-        System.out.println("Goodbye!");
-        scanner.close();
-    }
-
-    // Calculate gross pay with overtime handling
-    public static double calculateGrossPay(double hoursWorked) {
-        if (hoursWorked <= 40) {
-            return hoursWorked * REGULAR_HOURLY_RATE;
+        if (hoursWorked <= OVERTIME_THRESHOLD) {
+            // Regular hours only
+            grossPay = hoursWorked * payRate;
+        } else if (hoursWorked <= DOUBLE_OVERTIME_THRESHOLD) {
+            // Overtime but not double-overtime
+            double regularHours = OVERTIME_THRESHOLD;
+            double overtimeHours = hoursWorked - OVERTIME_THRESHOLD;
+            grossPay = (regularHours * payRate) + (overtimeHours * payRate * OVERTIME_MULTIPLIER);
         } else {
-            double overtimeHours = hoursWorked - 40;
-            return (40 * REGULAR_HOURLY_RATE) + (overtimeHours * OVERTIME_RATE);
+            // Double-overtime
+            double regularHours = OVERTIME_THRESHOLD;
+            double overtimeHours = DOUBLE_OVERTIME_THRESHOLD - OVERTIME_THRESHOLD;
+            double doubleOvertimeHours = hoursWorked - DOUBLE_OVERTIME_THRESHOLD;
+            grossPay = (regularHours * payRate) +
+                       (overtimeHours * payRate * OVERTIME_MULTIPLIER) +
+                       (doubleOvertimeHours * payRate * DOUBLE_OVERTIME_MULTIPLIER);
         }
+
+        return Math.round(grossPay * 100.0) / 100.0;  // Ensure rounding to 2 decimal places
     }
 
-    // Calculate insurance based on the number of dependents
+    /**
+     * Calculate insurance based on the number of dependents
+     */
     public static double calculateInsurance(int dependents) {
         return dependents >= 3 ? 35.00 : 15.00;
     }
 
-    // Calculate total deductions (taxes, union dues, and insurance)
-    public static double calculateDeductions(double grossPay, int dependents) {
+    /**
+     * Get life insurance cost based on the selected plan
+     */
+    public static double getLifeInsuranceCost(int plan) {
+        switch (plan) {
+            case 2:
+                return SINGLE_PLAN;
+            case 3:
+                return MARRIED_PLAN;
+            case 4:
+                return MARRIED_WITH_CHILDREN_PLAN;
+            default:
+                return NO_PLAN;
+        }
+    }
+
+    /**
+     * Calculate total deductions (taxes, union dues, insurance, life insurance, retirement)
+     */
+    public static double calculateDeductions(double grossPay, int dependents, int lifeInsurancePlan, boolean contributeToRetirement) {
         double insurance = calculateInsurance(dependents);
-        return (grossPay * SOCIAL_SECURITY_TAX) + 
-               (grossPay * FEDERAL_TAX) + 
-               (grossPay * STATE_TAX) + UNION_DUES + insurance;
+        double lifeInsurance = getLifeInsuranceCost(lifeInsurancePlan);
+        double retirementContribution = contributeToRetirement ? grossPay * 0.05 : 0.0;
+
+        double totalTaxes = (grossPay * SOCIAL_SECURITY_TAX) +
+                            (grossPay * FEDERAL_TAX) +
+                            (grossPay * STATE_TAX);
+
+        double deductions = totalTaxes + UNION_DUES + insurance + lifeInsurance + retirementContribution;
+        return Math.round(deductions * 100.0) / 100.0;  // Ensure rounding to 2 decimal places
     }
 
-    // Calculate net pay after all deductions
+    /**
+     * Calculate net pay after all deductions
+     */
     public static double calculateNetPay(double grossPay, double deductions) {
-        return grossPay - deductions;
+        double netPay = grossPay - deductions;
+        return Math.round(netPay * 100.0) / 100.0;  // Ensure rounding to 2 decimal places
     }
 
-    // Generate the payroll report with all relevant information
-    public static void generatePayrollReport(double hoursWorked, int dependents) {
-        double grossPay = calculateGrossPay(hoursWorked);
-        double deductions = calculateDeductions(grossPay, dependents);
-        double netPay = calculateNetPay(grossPay, deductions);
-
-        System.out.println("Payroll Stub:");
-        System.out.printf("   Hours: %.2f%n", hoursWorked);
-        System.out.printf("    Rate: %.2f $/hr%n", REGULAR_HOURLY_RATE);
-        System.out.printf("   Gross: $%.2f%n", grossPay);
-        System.out.printf("  SocSec: $%.2f%n", grossPay * SOCIAL_SECURITY_TAX);
-        System.out.printf("  FedTax: $%.2f%n", grossPay * FEDERAL_TAX);
-        System.out.printf("   StTax: $%.2f%n", grossPay * STATE_TAX);
-        System.out.printf("   Union: $%.2f%n", UNION_DUES);
-        System.out.printf("     Ins: $%.2f%n", calculateInsurance(dependents));
-        System.out.printf("     Net: $%.2f%n", netPay);
-    }
 }
